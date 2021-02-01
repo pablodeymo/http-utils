@@ -1,7 +1,7 @@
-use actix_web::{http::StatusCode, Responder};
 use anyhow::{anyhow, Result};
 use async_std::prelude::*;
 use futures::{StreamExt, TryStreamExt};
+use path_utils::convert_filename_extension_to_lowercase;
 use uuid::Uuid;
 
 pub async fn receive_multipart_file(mut body: actix_multipart::Multipart) -> Result<String> {
@@ -15,8 +15,14 @@ pub async fn receive_multipart_file(mut body: actix_multipart::Multipart) -> Res
         let filename = content_type
             .get_filename()
             .ok_or_else(|| anyhow!("Error receiving file"))?;
-        let file_uuid = Uuid::new_v4();
-        let filepath = format!("./{}{}", file_uuid, sanitize_filename::sanitize(&filename));
+        let filepath_uuid = format!(
+            "./{}{}",
+            Uuid::new_v4(),
+            sanitize_filename::sanitize(&filename)
+        );
+
+        let filepath = convert_filename_extension_to_lowercase(&filepath_uuid)
+            .ok_or_else(|| anyhow!("Filename error"))?;
         filepath_dest = filepath.clone();
         let mut f = async_std::fs::File::create(filepath).await?;
 
@@ -30,10 +36,14 @@ pub async fn receive_multipart_file(mut body: actix_multipart::Multipart) -> Res
 }
 
 #[cfg(feature = "enablereqwest")]
-pub async fn pass_post_to_server(url: &str, req: &impl serde::Serialize) -> impl Responder {
+pub async fn pass_post_to_server(
+    url: &str,
+    req: &impl serde::Serialize,
+) -> impl actix_web::Responder {
+    use actix_web::{http::StatusCode, Responder};
+
     let client = reqwest::Client::new();
     let res = client.post(url).json(req).send().await;
-
     match res {
         Ok(response) => {
             let status = response.status();

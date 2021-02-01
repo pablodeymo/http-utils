@@ -1283,7 +1283,7 @@ dependencies = [
 
 [[package]]
 name = "http-utils"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "actix-multipart",
  "actix-rt",
@@ -1293,6 +1293,7 @@ dependencies = [
  "async-std",
  "futures",
  "json",
+ "path-utils",
  "reqwest",
  "sanitize-filename",
  "serde",
@@ -1687,6 +1688,14 @@ dependencies = [
  "redox_syscall",
  "smallvec",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "path-utils"
+version = "0.3.0"
+source = "git+https://github.com/pablodeymo/path-utils#182b451dcc1934edd8950e0b01391b1112a72153"
+dependencies = [
+ "anyhow",
 ]
 
 [[package]]
