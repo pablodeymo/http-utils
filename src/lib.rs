@@ -29,6 +29,7 @@ pub async fn receive_multipart_file(mut body: actix_multipart::Multipart) -> Res
     Ok(filepath_dest)
 }
 
+#[cfg(feature = "enablereqwest")]
 pub async fn pass_post_to_server(url: &str, req: &impl serde::Serialize) -> impl Responder {
     let client = reqwest::Client::new();
     let res = client.post(url).json(req).send().await;
