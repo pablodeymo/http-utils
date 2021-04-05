@@ -1,13 +1,12 @@
 [package]
 name = "http-utils"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["Pablo Deymonnaz <deymonnaz@gmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# Version necessary for compatibility with actix-web 2
 actix-multipart = "0.3.0"
 actix-rt = "2.1.0"
 actix-service = "1.0.6"
@@ -25,7 +24,7 @@ path-utils = { version = "0.3.0", git = "https://github.com/pablodeymo/path-util
 
 # Optional for fordwarding request
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "json"], optional = true }
-actix-web = { version="3.3.2", features=["rust-tls"], optional = true  }
+actix-web = { version="3.3.2", features=["rust-tls"] }
 
 [features]
-enablereqwest = ["reqwest", "actix-web"]
+enablereqwest = ["reqwest"]

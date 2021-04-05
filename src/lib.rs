@@ -1,3 +1,4 @@
+use actix_web::HttpResponse;
 use anyhow::{anyhow, Result};
 use async_std::prelude::*;
 use futures::{StreamExt, TryStreamExt};
@@ -33,6 +34,18 @@ pub async fn receive_multipart_file(mut body: actix_multipart::Multipart) -> Res
         }
     }
     Ok(filepath_dest)
+}
+
+pub fn send_file_content(
+    file_content: actix_web::web::Bytes,
+    filename: &str,
+    content_type: &str,
+) -> HttpResponse {
+    let content_disposition_header = format!("attachment; filename=\"{}\"", filename);
+    HttpResponse::Ok()
+        .set_header("Content-Disposition", content_disposition_header)
+        .set_header("Content-Type", content_type)
+        .body(actix_web::body::Body::Bytes(file_content))
 }
 
 #[cfg(feature = "enablereqwest")]
