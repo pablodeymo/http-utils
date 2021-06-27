@@ -43,8 +43,8 @@ pub fn send_file_content(
 ) -> HttpResponse {
     let content_disposition_header = format!("attachment; filename=\"{}\"", filename);
     HttpResponse::Ok()
-        .set_header("Content-Disposition", content_disposition_header)
-        .set_header("Content-Type", content_type)
+        .insert_header(("Content-Disposition", content_disposition_header))
+        .insert_header(("Content-Type", content_type))
         .body(actix_web::body::Body::Bytes(file_content))
 }
 
