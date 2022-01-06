@@ -1,6 +1,8 @@
+use actix_web::web::Bytes;
 use actix_web::HttpResponse;
 use anyhow::{anyhow, Result};
 use async_std::prelude::*;
+use error_utils::msghttp::MsgHttp;
 use futures::{StreamExt, TryStreamExt};
 use path_utils::convert_filename_extension_to_lowercase;
 use uuid::Uuid;
@@ -29,23 +31,49 @@ pub async fn receive_multipart_file(mut body: actix_multipart::Multipart) -> Res
 
         // Field in turn is stream of *Bytes* object
         while let Some(chunk) = field.next().await {
-            let data = chunk.unwrap();
-            f.write_all(&data).await?;
+            if let Ok(data) = chunk {
+                f.write_all(&data).await?;
+            }
         }
     }
     Ok(filepath_dest)
 }
 
-pub fn send_file_content(
-    file_content: actix_web::web::Bytes,
-    filename: &str,
-    content_type: &str,
-) -> HttpResponse {
+pub fn send_file_content(file_content: Bytes, filename: &str, content_type: &str) -> HttpResponse {
     let content_disposition_header = format!("attachment; filename=\"{}\"", filename);
     HttpResponse::Ok()
         .set_header("Content-Disposition", content_disposition_header)
         .set_header("Content-Type", content_type)
         .body(actix_web::body::Body::Bytes(file_content))
+}
+
+/// Reads the content of the file in the `filename` location and
+/// returns the content in bytes encoded in actix-http `HttpResponse`
+/// struct.
+///
+/// # Params
+///
+/// `filename` path of the file to read
+/// `content_type` content-type of the file to send
+///
+/// # Errors
+///
+/// Returns an error in case the file can not be read or deleted.
+pub fn send_file_content_and_delete_file(
+    filename: &str,
+    content_type: &str,
+) -> Result<HttpResponse, MsgHttp> {
+    // leer el contenido del archivo temporal a un buffer de bytes
+    let file_content =
+        Bytes::from(std::fs::read(&filename).map_err(|e| MsgHttp::new(e.to_string(), 500))?);
+    // eliminar el archivo temporal
+    std::fs::remove_file(filename).map_err(|e| MsgHttp::new(e.to_string(), 500))?;
+
+    let content_disposition_header = format!("attachment; filename=\"{}\"", filename);
+    Ok(HttpResponse::Ok()
+        .set_header("Content-Disposition", content_disposition_header)
+        .set_header("Content-Type", content_type)
+        .body(actix_web::body::Body::Bytes(file_content)))
 }
 
 #[cfg(feature = "enablereqwest")]
