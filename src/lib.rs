@@ -1,4 +1,4 @@
-use actix_web::HttpResponse;
+use actix_web::{web, HttpResponse};
 use anyhow::{anyhow, Result};
 use async_std::prelude::*;
 use futures::{StreamExt, TryStreamExt};
@@ -10,10 +10,8 @@ pub async fn receive_multipart_file(mut body: actix_multipart::Multipart) -> Res
     // recibir el archivo
     // iterate over multipart stream
     while let Ok(Some(mut field)) = body.try_next().await {
-        let content_type = field
+        let filename = field
             .content_disposition()
-            .ok_or_else(|| anyhow!("Error receiving file"))?;
-        let filename = content_type
             .get_filename()
             .ok_or_else(|| anyhow!("Error receiving file"))?;
         let filepath_uuid = format!(
@@ -37,7 +35,7 @@ pub async fn receive_multipart_file(mut body: actix_multipart::Multipart) -> Res
 }
 
 pub fn send_file_content(
-    file_content: actix_web::web::Bytes,
+    file_content: web::Bytes,
     filename: &str,
     content_type: &str,
 ) -> HttpResponse {
@@ -45,7 +43,7 @@ pub fn send_file_content(
     HttpResponse::Ok()
         .insert_header(("Content-Disposition", content_disposition_header))
         .insert_header(("Content-Type", content_type))
-        .body(actix_web::body::Body::Bytes(file_content))
+        .body(file_content)
 }
 
 #[cfg(feature = "enablereqwest")]
@@ -60,10 +58,16 @@ pub async fn pass_post_to_server(
     match res {
         Ok(response) => {
             let status = response.status();
-            response.text().await.unwrap().with_status(status)
+            response
+                .text()
+                .await
+                .unwrap()
+                .customize()
+                .with_status(status)
         }
         _ => "{\"status\": \"Internal Error\"}"
             .to_string()
+            .customize()
             .with_status(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }

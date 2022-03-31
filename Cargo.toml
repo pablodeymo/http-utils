@@ -1,13 +1,13 @@
 [package]
 name = "http-utils"
-version = "0.4.0"
+version = "0.6.0"
 authors = ["Pablo Deymonnaz <deymonnaz@gmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-actix-multipart = "0.3.0"
+actix-multipart = "0.4.0"
 actix-rt = "2.1.0"
 actix-service = "2.0.0"
 futures = "0.3.12"
