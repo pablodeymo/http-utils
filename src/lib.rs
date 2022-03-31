@@ -27,8 +27,9 @@ pub async fn receive_multipart_file(mut body: actix_multipart::Multipart) -> Res
 
         // Field in turn is stream of *Bytes* object
         while let Some(chunk) = field.next().await {
-            let data = chunk.unwrap();
-            f.write_all(&data).await?;
+            if let Ok(data) = chunk {
+                f.write_all(&data).await?;
+            }
         }
     }
     Ok(filepath_dest)
