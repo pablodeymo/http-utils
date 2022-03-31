@@ -7,6 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+actix-web = "4"
 actix-multipart = "0.4.0"
 actix-rt = "2.1.0"
 actix-service = "2.0.0"
@@ -21,11 +22,10 @@ serde_derive = "1.0"
 json = "*"
 uuid = { version = "0.8.2", features = ["v4"] }
 path-utils = { version = "0.3.0", git = "https://github.com/pablodeymo/path-utils" }
+error-utils = { version = "0.4.0", git = "https://github.com/pablodeymo/error-utils", features = ["enableactix"] }
 
 # Optional for fordwarding request
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "json"], optional = true }
-actix-web = "4"
-error-utils = { version = "0.4.0", git = "https://github.com/pablodeymo/error-utils", features = ["enableactix"] }
 
 [features]
 enablereqwest = ["reqwest"]
