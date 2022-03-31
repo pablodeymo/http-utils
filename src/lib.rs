@@ -1,6 +1,7 @@
 use actix_web::{web, HttpResponse};
 use anyhow::{anyhow, Result};
 use async_std::prelude::*;
+use error_utils::msghttp::MsgHttp;
 use futures::{StreamExt, TryStreamExt};
 use path_utils::convert_filename_extension_to_lowercase;
 use uuid::Uuid;
@@ -65,17 +66,16 @@ pub fn send_file_content_and_delete_file(
 ) -> Result<HttpResponse, MsgHttp> {
     // leer el contenido del archivo temporal a un buffer de bytes
     let file_content =
-        Bytes::from(std::fs::read(&filename).map_err(|e| MsgHttp::new(e.to_string(), 500))?);
+        web::Bytes::from(std::fs::read(&filename).map_err(|e| MsgHttp::new(e.to_string(), 500))?);
     // eliminar el archivo temporal
     std::fs::remove_file(filename).map_err(|e| MsgHttp::new(e.to_string(), 500))?;
 
     let content_disposition_header = format!("attachment; filename=\"{}\"", filename);
     Ok(HttpResponse::Ok()
-        .set_header("Content-Disposition", content_disposition_header)
-        .set_header("Content-Type", content_type)
-        .body(actix_web::body::Body::Bytes(file_content)))
+        .insert_header(("Content-Disposition", content_disposition_header))
+        .insert_header(("Content-Type", content_type))
+        .body(file_content))
 }
-
 
 #[cfg(feature = "enablereqwest")]
 pub async fn pass_post_to_server(

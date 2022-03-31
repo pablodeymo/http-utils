@@ -24,7 +24,8 @@ path-utils = { version = "0.3.0", git = "https://github.com/pablodeymo/path-util
 
 # Optional for fordwarding request
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "json"], optional = true }
-actix-web = "4.0.0-beta.8"
+actix-web = "4"
+error-utils = { version = "0.4.0", git = "https://github.com/pablodeymo/error-utils", features = ["enableactix"] }
 
 [features]
 enablereqwest = ["reqwest"]
