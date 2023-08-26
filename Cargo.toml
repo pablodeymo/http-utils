@@ -1,31 +1,36 @@
 [package]
 name = "http-utils"
-version = "0.6.0"
+version = "0.8.0"
 authors = ["Pablo Deymonnaz <deymonnaz@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 actix-web = "4"
-actix-multipart = "0.4.0"
+actix-multipart = "0.6.0"
 actix-rt = "2.1.0"
 actix-service = "2.0.0"
 futures = "0.3.12"
-async-std = "1.9.0"
-sanitize-filename = "0.3"
+tokio = { version = "1", features = ["fs"] }
+sanitize-filename = "0.5"
 anyhow = "1.0"
 
 serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
 json = "*"
-uuid = { version = "0.8.2", features = ["v4"] }
+uuid = { version = "1", features = ["v4"] }
 path-utils = { version = "0.3.0", git = "https://github.com/pablodeymo/path-utils" }
-error-utils = { version = "0.4.0", git = "https://github.com/pablodeymo/error-utils", features = ["enableactix"] }
+error-utils = { git = "https://github.com/pablodeymo/error-utils.git", features = [
+    "enableactix",
+] }
 
 # Optional for fordwarding request
-reqwest = { version = "0.11", default-features = false, features = ["blocking", "json"], optional = true }
+reqwest = { version = "0.11", default-features = false, features = [
+    "blocking",
+    "json",
+], optional = true }
 
 [features]
 enablereqwest = ["reqwest"]
